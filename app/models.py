@@ -20,11 +20,15 @@ class Taxonomy(db.Model):
 
 
 class SizeCurve():
-    #try prod_group_id = 17 and brand_name='Dynafit'
-    
-    def __init__(self, brand_name, prod_group_name):
-        self.query = Sales.query.filter_by(brand_name=brand_name, prod_group_name=prod_group_name)
+    #try prod_group_id = 22 and brand_name='Dynafit'
+    def __init__(self, brand_name, prod_group_id):
+        self.taxonomy = Taxonomy.query.filter_by(prod_group_id=prod_group_id).first().__dict__
+        self.taxonomy.pop('_sa_instance_state', None)
+
+    def get_taxonomy(self):
+        return self.taxonomy
 
     def curve(self):
-        return [{'size': result.size, 'quantity': result.quantity} for result in self.query.all()]
-    
+        query = Sales.query.filter_by(brand_name=brand_name, prod_group_name=self.taxonomy['prod_group_name'],
+                merch_group_name=self.taxonomy['merch_group_name'], merch_div_name=self.taxonomy['merch_div_name'])
+        return [{'size': result.size, 'quantity': result.quantity} for result in query.all()]
