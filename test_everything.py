@@ -1,11 +1,25 @@
 import pytest
 from app.models import*
 
-def test_size_curve():
-    s = SizeCurve("Dynafit", 22)
-    assert s.taxonomy['merch_div_id'] == 12
-    assert s.taxonomy['merch_group_name'] == 'Backcountry Boots'
+test_categories = [
+    {'brand_name': 'Dynafit', 'prod_group_id': 22},
+    {'brand_name': 'Park Tool', 'prod_group_id': 100000355},
+    {'brand_name': 'Columbia', 'prod_group_id': 100001246},
+    {'brand_name': 'Arc\'teryx', 'prod_group_id': 186}
+]
 
-    size_data = s.curve()
-    assert all('quantity' in size for size in size_data)
-    assert all('size' in size for size in size_data)
+def test_size_curve():
+    s = SizeCurve(**test_categories[2])
+    assert isinstance(s.taxonomy['merch_div_id'], int)
+    assert isinstance(s.taxonomy['merch_group_name'], str)
+
+    pg_sizes = s.pg_sizes()
+    mg_sizes = s.mg_sizes()
+    md_sizes = s.md_sizes()
+    assert all([isinstance(pg_sizes[size], int) for size in pg_sizes.keys()])
+    assert all([isinstance(mg_sizes[size], int) for size in mg_sizes.keys()])
+    assert all([isinstance(md_sizes[size], int) for size in md_sizes.keys()])
+
+    print('pg', pg_sizes)
+    print('mg', mg_sizes)
+    print('md', md_sizes)
