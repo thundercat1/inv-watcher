@@ -1,32 +1,30 @@
 from app import db
 
-class SpaceType(db.Model):
+class Sales(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(64))
-    def __init__(self, type):
-        self.type = type
+    prod_group_name = db.Column(db.String(128))
+    merch_group_name = db.Column(db.String(128))
+    merch_div_name = db.Column(db.String(128))
+    brand_name = db.Column(db.String(128))
+    quantity = db.Column(db.Integer)
+    size = db.Column(db.String(128))
 
 
-class Space(db.Model):
-    location = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(64), db.ForeignKey('space_type.type'))
-    name = db.Column(db.String(64))
+class Taxonomy(db.Model):
+    prod_group_id = db.Column(db.Integer, primary_key=True)
+    merch_group_id = db.Column(db.Integer)
+    merch_div_id = db.Column(db.Integer)
+    prod_group_name = db.Column(db.String(128))
+    merch_group_name = db.Column(db.String(128))
+    merch_div_name = db.Column(db.String(128))
 
-class Property(Space):
-    price = db.Column(db.Integer)
-    color_group = db.Column(db.String(64))
 
-    def __init__(self, name, price, color_group, location):
-        self.location = location;
-        self.type = 'Property'
-        self.name = name
-        self.price = price
-        self.color_group = color_group
-
-class Tax(Space):
-    amount = db.Column(db.Integer)
+class SizeCurve():
+    #try prod_group_id = 17 and brand_name='Dynafit'
     
-    def __init__(self, name, location):
-        self.type = 'Tax'
-        self.name = name
-        self.location = location
+    def __init__(self, brand_name, prod_group_name):
+        self.query = Sales.query.filter_by(brand_name=brand_name, prod_group_name=prod_group_name)
+
+    def curve(self):
+        return [{'size': result.size, 'quantity': result.quantity} for result in self.query.all()]
+    

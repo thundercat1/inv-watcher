@@ -1,7 +1,7 @@
 from app import db, models
 
-models.SpaceType.query.delete()
-models.Space.query.delete()
+models.Sales.query.delete()
+models.Taxonomy.query.delete()
 db.session.commit()
 
 
