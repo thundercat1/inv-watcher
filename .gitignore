@@ -5,4 +5,5 @@
 *.csv#
 *.csv~
 *.swo
+.idea/
 config.py

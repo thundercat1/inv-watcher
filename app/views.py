@@ -16,23 +16,9 @@ def sizeCurves():
     #http://localhost:5000/sizeCurves?pg=100001246&brand=Columbia&sizes=M,L,XL
     #http://localhost:5000/sizeCurves?style=COL3599&brand=Columbia&sizes=M,L,XL
 
-    brand_name = request.args.get('brand')
-    sizes = request.args.get('sizes')
-    style = request.args.get('style')
-
-    if sizes is not None:
-        sizes = sizes.split(',')
-
-    if sizes is None and style is None:
-        return 'Must include sizes argument if no style is provided', 400
-
-    prod_group_id = request.args.get('pg')
-    if prod_group_id is None and style is None:
-        return 'Must include either pg or style', 400
-
-    if style is not None:
-        (prod_group_id, brand_name, sizes) = get_style_details(style)
-
+    ((prod_group_id, brand_name, sizes), error) = simplify_args(request)
+    if error is not None:
+        return error
     s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
     return json.dumps(s.size_percents(sizes))
 
@@ -43,36 +29,44 @@ def quantities():
     #http://localhost:5000/quantities?pg=100001246&brand=Columbia&sizes=M,L,XL
     #http://localhost:5000/quantities?style=COL3599&sizes=M,L,XL
 
+    ((prod_group_id, brand_name, sizes), error) = simplify_args(request)
+    if error is not None:
+        return error
+
+    qty = request.args.get('qty')
+    try:
+        qty = int(qty)
+    except TypeError:
+        return 'Must provide qty argument', 400
+
+    s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
+    quantities = assign_quantities(sizes=sizes, qty=qty, brand_name=brand_name, prod_group_id=prod_group_id)
+    print(quantities)
+    return json.dumps(quantities)
+
+def simplify_args(request):
     brand_name = request.args.get('brand')
-    qty = int(request.args.get('qty'))
     style = request.args.get('style')
-
-    if qty is None:
-        return 'Must include qty argument', 400
-
     sizes = request.args.get('sizes')
+    prod_group_id = request.args.get('pg')
+    error = None
+
     if sizes is not None:
         sizes = sizes.split(',')
 
-    if sizes is None and style is None:
-        return 'Must include sizes if no style is provided', 400
-
-    prod_group_id = request.args.get('pg')
-    style = request.args.get('style')
     if prod_group_id is None and style is None:
-        return 'Must include either pg or style', 400
+        error = ('Must include either pg or style', 400)
+        return ((None,)*3, error)
+
+    if sizes is None and style is None:
+        error = ('Must include either a style or a list of sizes', 400)
+        return ((None,)*3, error)
 
     if style is not None:
-        (prod_group_id, brand_name, sizes) = get_style_details(style)
-
-    s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
-
-    quantities = assign_quantities(sizes=sizes, qty=qty, brand_name=brand_name, prod_group_id=prod_group_id)
-
-    print(quantities)
-
-    return json.dumps(quantities)
-
+        style_details = get_style_details(style)
+        print(style_details)
+        print(style_details, error)
+        return (style_details, error)
 
 def assign_quantities(sizes, qty, brand_name, prod_group_id):
     s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
