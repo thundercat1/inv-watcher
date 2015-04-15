@@ -27,18 +27,30 @@ class SizeCurve():
         self.taxonomy.pop('_sa_instance_state', None)
         self.brand_name = brand_name
 
-    def curve(self):
-        pass
 
-    def size_percents(self, sizes):
-        matched_sizes = {}
-        pg_quantities = self.pg_quantities()
+    def size_percents(self, sizes, min_avg_sales_per_size=5):
 
-        matched_sales = {size: pg_quantities[size] for size in sizes.keys() if size in pg_quantities}
-        sum_matched_sales = sum([matched_sales[size] for size in matched_sales])
+        if len(sizes) > 0:
+            #First calculate matched sales at the PG
+            pg_quantities = self.pg_quantities()
+            matched_sales = {size: pg_quantities[size] for size in sizes if size in pg_quantities}
+            sum_matched_sales = sum([matched_sales[size] for size in matched_sales])
+        
+        if sum_matched_sales < len(sizes)*min_avg_sales_per_size:
+            #Not enough matches at PG - try going up to the Mg
+            mg_quantities = self.mg_quantities()
+            matched_sales = {size: mg_quantities[size] for size in sizes if size in mg_quantities}
+            sum_matched_sales = sum([matched_sales[size] for size in matched_sales])
 
-        return {size: matched_sales[size]/float(sum_matched_sales) for size in sizes}
+        if sum_matched_sales < len(sizes)*min_avg_sales_per_size:
+            #Not enough matches at MG - go up to the MD
+            md_quantities = self.md_quantities()
+            matched_sales = {size: md_quantities[size] for size in sizes if size in md_quantities}
+            sum_matched_sales = sum([matched_sales[size] for size in matched_sales])
 
+
+        return {size: matched_sales[size]/float(sum_matched_sales) if size in matched_sales else None 
+                for size in sizes}
 
 
     def pg_quantities(self):
