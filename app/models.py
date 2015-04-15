@@ -1,3 +1,4 @@
+from __future__ import print_function
 from app import db
 from sqlalchemy import func
 from sqlalchemy.sql import label

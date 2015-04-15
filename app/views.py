@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from app import app
 from models import *
 import json
