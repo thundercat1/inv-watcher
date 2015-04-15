@@ -9,17 +9,29 @@ test_categories = [
 ]
 
 def test_size_curve():
+    for test in test_categories:
+        print('Testing', test['brand_name'], 'prod group', test['prod_group_id'])
+        s = SizeCurve(**test)
+        assert isinstance(s.taxonomy['merch_div_id'], int)
+        assert isinstance(s.taxonomy['merch_group_name'], (unicode, str))
+
+        pg_quantities = s.pg_quantities()
+        mg_quantities = s.mg_quantities()
+        md_quantities = s.md_quantities()
+        assert all([isinstance(pg_quantities[size], int) for size in pg_quantities.keys()])
+        assert all([isinstance(mg_quantities[size], int) for size in mg_quantities.keys()])
+        assert all([isinstance(md_quantities[size], int) for size in md_quantities.keys()])
+
+        print(pg_quantities)
+
+def test_calculating_size_curve_percentages():
+    #first test with columbia
     s = SizeCurve(**test_categories[2])
-    assert isinstance(s.taxonomy['merch_div_id'], int)
-    assert isinstance(s.taxonomy['merch_group_name'], str)
+    sizes = {'S': None, 'M': None, 'L': None}
 
-    pg_sizes = s.pg_sizes()
-    mg_sizes = s.mg_sizes()
-    md_sizes = s.md_sizes()
-    assert all([isinstance(pg_sizes[size], int) for size in pg_sizes.keys()])
-    assert all([isinstance(mg_sizes[size], int) for size in mg_sizes.keys()])
-    assert all([isinstance(md_sizes[size], int) for size in md_sizes.keys()])
+    size_percents = s.size_percents(sizes)
+    print(size_percents)
+    assert len(size_percents) == 3
+    assert abs(size_percents['S'] + size_percents['M'] + size_percents['L'] - 1) < .001
 
-    print('pg', pg_sizes)
-    print('mg', mg_sizes)
-    print('md', md_sizes)
+
