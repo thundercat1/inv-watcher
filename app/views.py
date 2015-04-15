@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 from app import app
+from app import cache
 from models import *
 import json
 import requests
@@ -24,8 +25,8 @@ def sizeCurves():
     s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
     return json.dumps(s.size_percents(sizes))
 
-
 @app.route('/quantities', methods=['GET'])
+
 def quantities():
     #Example calls:
     #http://localhost:5000/quantities?pg=100001246&brand=Columbia&sizes=M,L,XL
@@ -75,7 +76,7 @@ def assign_quantities(sizes, qty, brand_name, prod_group_id):
     size_percents = s.size_percents(sizes)
     return {size: int(qty*size_percents[size]) if size_percents[size] is not None else None for size in sizes}
 
-
+@cache.cached(timeout=60)
 def get_style_details(style):
     url = base_url + '/merchv3/products/%s' % (style)
     print(url)

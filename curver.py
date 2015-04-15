@@ -27,8 +27,12 @@ def get_items_from_csv(fname):
     return items
 
 def calculate_sizes(items, url):
+    item_count = len(items)
+    finished = 0
     for item in items:
+        item_start_time = time.time()
         print('calculating size curve for', item['style'], item['color'])
+        print('%s/%s complete' % (finished, item_count))
         r = requests.get(url + '/quantities',
                          params={'style': item['style'], 'qty': item['qty']})
 
@@ -38,6 +42,9 @@ def calculate_sizes(items, url):
         else:
             print(r.status_code, r.text)
             item['sizes'] = None
+
+        finished += 1
+        #print('t=', time.time() - item_start_time)
 
 def write_csv(items, fname):
     print('Writing output to', fname)
@@ -59,16 +66,19 @@ if __name__ == '__main__':
     start_time = time.time()
     url = 'http://localhost:5000'
     args = sys.argv
-    if len(args) != 2:
+    if len(args) < 2:
         print('Error. Please provide a single argument with the filename to curve.')
         exit()
 
     input_file = args[1]
-    output_file = 'results.csv'
+    try:
+        output_file = args[2]
+    except IndexError:
+        output_file = 'results.csv'
+
     items = get_items_from_csv(input_file)
     item_count = len(items)
     print('Found', item_count, 'items to curve.')
     calculate_sizes(items, url)
-    print(items)
     write_csv(items, output_file)
     print('Curved', item_count, 'items in ', round(time.time() - start_time), 'seconds.')
