@@ -23,12 +23,14 @@ class Taxonomy(db.Model):
 class SizeCurve():
     #try prod_group_id = 22 and brand_name='Dynafit'
     def __init__(self, brand_name, prod_group_id):
+        print('pg', prod_group_id)
         self.taxonomy = Taxonomy.query.filter_by(prod_group_id=prod_group_id).first().__dict__
         self.taxonomy.pop('_sa_instance_state', None)
         self.brand_name = brand_name
 
 
-    def size_percents(self, sizes, min_avg_sales_per_size=5):
+    def size_percents(self, sizes, min_avg_sales_per_size=20):
+        print(sizes)
 
         if len(sizes) > 0:
             #First calculate matched sales at the PG
@@ -49,6 +51,7 @@ class SizeCurve():
             sum_matched_sales = sum([matched_sales[size] for size in matched_sales])
 
 
+        print('matched', matched_sales)
         return {size: matched_sales[size]/float(sum_matched_sales) if size in matched_sales else None 
                 for size in sizes}
 
