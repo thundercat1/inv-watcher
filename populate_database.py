@@ -26,4 +26,4 @@ def insert_from_csv(fname, model, batch_size=None):
 
 if __name__ == '__main__':
     insert_from_csv('backend-taxonomy.csv', models.Taxonomy)
-    insert_from_csv('size-data.csv', models.Sales)
+    insert_from_csv('sales by size.csv', models.Sales)

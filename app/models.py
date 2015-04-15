@@ -23,11 +23,10 @@ class Taxonomy(db.Model):
 class SizeCurve():
     #try prod_group_id = 22 and brand_name='Dynafit'
     def __init__(self, brand_name, prod_group_id):
-        print('pg', prod_group_id)
+        print('pg', prod_group_id, brand_name)
         self.taxonomy = Taxonomy.query.filter_by(prod_group_id=prod_group_id).first().__dict__
         self.taxonomy.pop('_sa_instance_state', None)
         self.brand_name = brand_name
-
 
     def size_percents(self, sizes, min_avg_sales_per_size=20):
         print(sizes)

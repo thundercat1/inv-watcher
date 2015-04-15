@@ -3,5 +3,6 @@
 *.csv
 *.swp
 *.csv#
+*.csv~
 *.swo
 config.py

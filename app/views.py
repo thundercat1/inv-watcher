@@ -85,7 +85,7 @@ def get_style_details(style):
     print(url)
     r = requests.get(url)
     if r.status_code != 200:
-        print('Error retrieving PG from merch api')
+        print('Error retrieving product data from merch api')
         print(r.text)
         return None
 
