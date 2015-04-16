@@ -39,12 +39,12 @@ def quantities():
     qty = request.args.get('qty')
     try:
         qty = int(qty)
-    except TypeError:
-        return 'Must provide qty argument', 400
+    except (TypeError, ValueError):
+        return 'Must provide qty to successfully calculate size quantities', 400
 
     s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
     quantities = assign_quantities(sizes=sizes, qty=qty, brand_name=brand_name, prod_group_id=prod_group_id)
-    print(quantities)
+    #print(quantities)
     return json.dumps(quantities)
 
 def simplify_args(request):
@@ -67,8 +67,8 @@ def simplify_args(request):
 
     if style is not None:
         style_details = get_style_details(style)
-        print(style_details)
-        print(style_details, error)
+        #print(style_details)
+        #print(style_details, error)
         return (style_details, error)
 
 def assign_quantities(sizes, qty, brand_name, prod_group_id):
@@ -76,7 +76,8 @@ def assign_quantities(sizes, qty, brand_name, prod_group_id):
     size_percents = s.size_percents(sizes)
     return {size: int(qty*size_percents[size]) if size_percents[size] is not None else None for size in sizes}
 
-@cache.cached(timeout=60)
+#@cache.cached(timeout=60)
+@cache.memoize(50)
 def get_style_details(style):
     url = base_url + '/merchv3/products/%s' % (style)
     print(url)

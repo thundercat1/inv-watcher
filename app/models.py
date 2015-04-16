@@ -34,24 +34,24 @@ class SizeCurve():
             pg_quantities = self.pg_quantities()
             matched_sales = {size: pg_quantities[size] for size in sizes if size in pg_quantities}
             sum_matched_sales = sum([matched_sales[size] for size in matched_sales])
-            print('Found', sum_matched_sales, 'sales at PG-Brand to use for size curve.')
+            #print('Found', sum_matched_sales, 'sales at PG-Brand to use for size curve.')
         
         if sum_matched_sales < len(sizes)*min_avg_sales_per_size:
             #Not enough matches at PG - try going up to the Mg
             mg_quantities = self.mg_quantities()
             matched_sales = {size: mg_quantities[size] for size in sizes if size in mg_quantities}
             sum_matched_sales = sum([matched_sales[size] for size in matched_sales])
-            print('Found', sum_matched_sales, 'sales at MG-Brand to use for size curve.')
+            #print('Found', sum_matched_sales, 'sales at MG-Brand to use for size curve.')
 
         if sum_matched_sales < len(sizes)*min_avg_sales_per_size:
             #Not enough matches at MG - go up to the MD
             md_quantities = self.md_quantities()
             matched_sales = {size: md_quantities[size] for size in sizes if size in md_quantities}
             sum_matched_sales = sum([matched_sales[size] for size in matched_sales])
-            print('Found', sum_matched_sales, 'sales at MD-Brand to use for size curve.')
+            #print('Found', sum_matched_sales, 'sales at MD-Brand to use for size curve.')
 
 
-        print('Calculating size curve with the following sales data: ', matched_sales)
+        #print('Calculating size curve with the following sales data: ', matched_sales)
         return {size: matched_sales[size]/float(sum_matched_sales) if size in matched_sales else None 
                 for size in sizes}
 
