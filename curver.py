@@ -18,6 +18,9 @@ def get_items_from_csv(fname):
     with open(fname) as csvfile:
         r = csv.DictReader(csvfile)
         for row in r:
+            if row['qty'] == '':
+                row['qty'] = 0
+
             items.append({
                 'style': row['style'],
                 'color': row['color'],
@@ -41,7 +44,7 @@ def calculate_sizes(items, url):
 
         else:
             print(r.status_code, r.text)
-            item['sizes'] = None
+            item['sizes'] = {'Error': 'Error'}
 
         finished += 1
         #print('t=', time.time() - item_start_time)
@@ -53,6 +56,7 @@ def write_csv(items, fname):
         writer.writerow(['style', 'color', 'size', 'qty'])
 
         for item in items:
+            print(item)
             for size in item['sizes']:
                 writer.writerow([
                     item['style'],

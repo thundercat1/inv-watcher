@@ -74,7 +74,7 @@ def simplify_args(request):
 def assign_quantities(sizes, qty, brand_name, prod_group_id):
     s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
     size_percents = s.size_percents(sizes)
-    return {size: int(qty*size_percents[size]) if size_percents[size] is not None else None for size in sizes}
+    return {size: int(round(qty*size_percents[size])) if size_percents[size] is not None else None for size in sizes}
 
 #@cache.cached(timeout=60)
 @cache.memoize(50)
