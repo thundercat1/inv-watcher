@@ -26,7 +26,6 @@ def sizeCurves():
     return json.dumps(s.size_percents(sizes))
 
 @app.route('/quantities', methods=['GET'])
-
 def quantities():
     #Example calls:
     #http://localhost:5000/quantities?pg=100001246&brand=Columbia&sizes=M,L,XL
@@ -42,9 +41,7 @@ def quantities():
     except (TypeError, ValueError):
         return 'Must provide qty to successfully calculate size quantities', 400
 
-    s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
     quantities = assign_quantities(sizes=sizes, qty=qty, brand_name=brand_name, prod_group_id=prod_group_id)
-    #print(quantities)
     return json.dumps(quantities)
 
 def simplify_args(request):
@@ -67,20 +64,22 @@ def simplify_args(request):
 
     if style is not None:
         style_details = get_style_details(style)
-        #print(style_details)
-        #print(style_details, error)
         return (style_details, error)
 
 def assign_quantities(sizes, qty, brand_name, prod_group_id):
-    s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
-    size_percents = s.size_percents(sizes)
+    size_percents = get_size_percents(brand_name=brand_name, prod_group_id=prod_group_id, sizes=sizes)
     return {size: int(round(qty*size_percents[size])) if size_percents[size] is not None else None for size in sizes}
 
-#@cache.cached(timeout=60)
-@cache.memoize(50)
+
+@cache.memoize(60)
+def get_size_percents(brand_name, prod_group_id, sizes):
+    s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)
+    return s.size_percents(sizes)
+
+@cache.memoize(60)
 def get_style_details(style):
     url = base_url + '/merchv3/products/%s' % (style)
-    print(url)
+    print('Getting style details from', url)
     r = requests.get(url)
     if r.status_code != 200:
         print('Error retrieving product data from merch api')

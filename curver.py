@@ -56,19 +56,21 @@ def write_csv(items, fname):
         writer.writerow(['style', 'color', 'size', 'qty'])
 
         for item in items:
-            print(item)
-            for size in item['sizes']:
-                writer.writerow([
-                    item['style'],
-                    item['color'],
-                    size,
-                    item['sizes'][size]
-                ])
+            try:
+                for size in item['sizes']:
+                    writer.writerow([
+                        item['style'],
+                        item['color'],
+                        size,
+                        item['sizes'][size]
+                    ])
+            except:
+                print('Error writting item to file:', item)
 
 
 if __name__ == '__main__':
     start_time = time.time()
-    url = 'http://localhost:5000'
+    url = 'http://127.0.0.1:5000'
     args = sys.argv
     if len(args) < 2:
         print('Error. Please provide a single argument with the filename to curve.')
