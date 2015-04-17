@@ -2,12 +2,14 @@ from __future__ import print_function
 
 from app import app
 from app import cache
-from models import *
+from app.models import *
+
 import json
 import requests
-
 from flask import request
+
 from config import base_url
+from allocation import allocate
 
 @app.route('/')
 def root():
@@ -68,7 +70,8 @@ def simplify_args(request):
 
 def assign_quantities(sizes, qty, brand_name, prod_group_id):
     size_percents = get_size_percents(brand_name=brand_name, prod_group_id=prod_group_id, sizes=sizes)
-    return {size: int(round(qty*size_percents[size])) if size_percents[size] is not None else None for size in sizes}
+    return allocate(size_percents, qty)
+    #return {size: int(round(qty*size_percents[size])) if size_percents[size] is not None else None for size in sizes}
 
 
 @cache.memoize(60)

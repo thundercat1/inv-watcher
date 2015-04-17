@@ -2,6 +2,7 @@ import pytest
 from app.models import*
 from app.views import assign_quantities
 import app.views as views
+from allocation import *
 
 test_categories = [
     {'brand_name': 'Dynafit', 'prod_group_id': 22},
@@ -12,10 +13,10 @@ test_categories = [
 
 def test_size_curve():
     for test in test_categories:
-        print('Testing', test['brand_name'], 'prod group', test['prod_group_id'])
+        #print('Testing', test['brand_name'], 'prod group', test['prod_group_id'])
         s = SizeCurve(**test)
         assert isinstance(s.taxonomy['merch_div_id'], int)
-        assert isinstance(s.taxonomy['merch_group_name'], (unicode, str))
+        assert isinstance(s.taxonomy['merch_group_name'], (str))
 
         pg_quantities = s.pg_quantities()
         mg_quantities = s.mg_quantities()
@@ -24,7 +25,7 @@ def test_size_curve():
         assert all([isinstance(mg_quantities[size], int) for size in mg_quantities.keys()])
         assert all([isinstance(md_quantities[size], int) for size in md_quantities.keys()])
 
-        print(pg_quantities)
+        #print(pg_quantities)
 
 
 def test_calculating_size_curve_percentages():
@@ -54,10 +55,21 @@ def test_assigning_quantities():
     quantities = assign_quantities(sizes=sizes, qty=qty, **test_categories[2])
     assert abs(sum([quantities[size] for size in sizes]) - 100) < 4
 
-@pytest.mark.xfail
 def test_quantities_assigned_sum_up_correctly():
     sizes = ['S', 'M', 'L'] 
     qty = 100
     quantities = assign_quantities(sizes=sizes, qty=qty, **test_categories[2])
     assert sum([quantities[size] for size in sizes]) == qty
 
+def test_allocation_algorithm():
+    percents = {'S': .25, 'M': .25, 'L': .5}
+    total = 100
+    assert allocate(percents, total) == {'S': 25, 'M': 25, 'L': 50}
+
+    percents = {'S': .24, 'M': .26, 'L': .5}
+    total = 2
+    assert allocate(percents, total) == {'S': 0, 'M': 1, 'L': 1}
+
+    percents = {'S': .25, 'M': .26, 'L': .5, 'XL': None}
+    total = 2
+    assert allocate(percents, total) == {'S': 0, 'M': 1, 'L': 1, 'XL': None}
