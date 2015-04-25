@@ -1,6 +1,6 @@
 from app import db, models
 
-models.Sales.query.delete()
+models.SalesBySize.query.delete()
 models.Taxonomy.query.delete()
 db.session.commit()
 

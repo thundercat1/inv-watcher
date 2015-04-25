@@ -1,7 +1,7 @@
 from app import db, models
 import csv
 
-models.Sales.query.delete()
+models.SalesBySize.query.delete()
 models.Taxonomy.query.delete()
 db.session.commit()
 
@@ -26,4 +26,4 @@ def insert_from_csv(fname, model, batch_size=None):
 
 if __name__ == '__main__':
     insert_from_csv('backend-taxonomy.csv', models.Taxonomy)
-    insert_from_csv('sales by size.csv', models.Sales)
+    insert_from_csv('sales by size.csv', models.SalesBySize)

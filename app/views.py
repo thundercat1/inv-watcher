@@ -73,7 +73,6 @@ def assign_quantities(sizes, qty, brand_name, prod_group_id):
     return allocate(size_percents, qty)
     #return {size: int(round(qty*size_percents[size])) if size_percents[size] is not None else None for size in sizes}
 
-
 @cache.memoize(60)
 def get_size_percents(brand_name, prod_group_id, sizes):
     s = SizeCurve(brand_name=brand_name, prod_group_id=prod_group_id)

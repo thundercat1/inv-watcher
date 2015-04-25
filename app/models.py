@@ -3,7 +3,7 @@ from app import db
 from sqlalchemy import func
 from sqlalchemy.sql import label
 
-class Sales(db.Model):
+class SalesBySize(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     prod_group_name = db.Column(db.String(128))
     merch_group_name = db.Column(db.String(128))
@@ -58,25 +58,25 @@ class SizeCurve():
 
     def pg_quantities(self):
         #Filter to include sales with same brand, pg, mg, md
-        sizes_query = db.session.query(Sales.size, label('quantity', func.sum(Sales.quantity))). \
+        sizes_query = db.session.query(SalesBySize.size, label('quantity', func.sum(SalesBySize.quantity))). \
             filter_by(brand_name=self.brand_name, prod_group_name=self.taxonomy['prod_group_name'],
                 merch_group_name=self.taxonomy['merch_group_name'], merch_div_name=self.taxonomy['merch_div_name']).\
-            group_by(Sales.size)
+            group_by(SalesBySize.size)
         return {result.size: result.quantity for result in sizes_query.all()}
 
 
     def mg_quantities(self):
         #Filter to include sales with same brand, mg, md
-        query = db.session.query(Sales.size, label('quantity', func.sum(Sales.quantity))). \
+        query = db.session.query(SalesBySize.size, label('quantity', func.sum(SalesBySize.quantity))). \
             filter_by(brand_name=self.brand_name, merch_group_name=self.taxonomy['merch_group_name'],
                       merch_div_name=self.taxonomy['merch_div_name']). \
-            group_by(Sales.size)
+            group_by(SalesBySize.size)
         return {result.size: result.quantity for result in query.all()}
 
 
     def md_quantities(self):
         #Filter to include sales with same brand, md
-        query = db.session.query(Sales.size, label('quantity', func.sum(Sales.quantity))). \
+        query = db.session.query(SalesBySize.size, label('quantity', func.sum(SalesBySize.quantity))). \
             filter_by(brand_name=self.brand_name, merch_div_name=self.taxonomy['merch_div_name']). \
-            group_by(Sales.size)
+            group_by(SalesBySize.size)
         return {result.size: result.quantity for result in query.all()}
